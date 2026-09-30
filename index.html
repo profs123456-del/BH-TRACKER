@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>RAN ONLINE — BOSS TRACKER</title>
+
+<!-- DESIGNER FONTS -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+
+<!-- FAVICON -->
+<link rel="icon" type="image/png" href="image/icon/UG_logo.png">
+
+<!-- STYLES -->
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div id="appShell">
+
+  <!-- ============ TOP BAR ============ -->
+  <header id="topBar">
+    <div class="topbar-left">
+      <div id="rightLogo"><img src="image/icon/UG_logo.png" alt="UNGOVERNED" onerror="this.parentElement.style.display='none'"></div>
+      <div class="brand-text">
+        <div class="brand-title"><span class="brand-un">UN</span><span class="brand-govern">GOVERN</span><span class="brand-ed">ED</span></div>
+        <div class="brand-sub">BOSS TRACKER</div>
+      </div>
+      <nav class="brand-nav"><span>STOP USING NOTEPAD</span></nav>
+    </div>
+    <div class="topbar-right">
+      <div class="server-pill"><span class="dot" id="serverDot"></span><span id="serverLabel">Server: PH-Classic</span></div>
+      <div class="clock-pill"><span class="rf-icon">🕒</span><span id="liveClock">--:--:--</span><span id="liveDate">---</span></div>
+    </div>
+  </header>
+
+  <div id="appBody">
+
+    <!-- ============ LEFT NAV ============ -->
+    <nav id="sideNav">
+      <button class="nav-item active" data-target="nextBossPanel"><span class="nav-ico">🏠</span>Home</button>
+      <button class="nav-item" data-target="bossesSection"><span class="nav-ico">💀</span>Boss List</button>
+      <button class="nav-item" data-target="historyPanel"><span class="nav-ico">🕒</span>Kill History</button>
+      <button class="nav-item" id="navSettingsBtn" data-target="respawnFilterDock"><span class="nav-ico">⚙</span>Settings</button>
+
+      <div class="channel-legend">
+        <div class="legend-title"><span class="nav-ico">🎨</span>CHANNEL COLORS</div>
+        <div class="legend-item"><span class="legend-dot ch-0"></span>CH 0</div>
+        <div class="legend-item"><span class="legend-dot ch-1"></span>CH 1</div>
+        <div class="legend-item"><span class="legend-dot ch-2"></span>CH 2</div>
+        <div class="legend-item"><span class="legend-dot ch-3"></span>CH 3</div>
+      </div>
+
+      <div id="trashBin" class="trash-bin" title="Drag a card's ⠿ grip here to reset it">
+        <span class="trash-ico">🗑️</span>
+        <span class="trash-label">DRAG CARD<br>HERE TO<br>RESET</span>
+      </div>
+
+      <!-- MAP LOCATION PANEL (fills when a boss filter/search narrows the list) -->
+      <div id="mapPanel" class="map-panel">
+        <div class="map-panel-title"><span class="nav-ico">🗺️</span>MAP LOCATION</div>
+        <div id="mapTabs" class="map-tabs"></div>
+        <div id="mapPanelBody" class="map-panel-body"></div>
+      </div>
+    </nav>
+
+    <!-- ============ MAIN COLUMN ============ -->
+    <main id="mainCol">
+
+      <!-- NEXT SPAWN HERO -->
+      <div id="nextBossPanel">
+        <div class="hero-live-badge"><span class="hero-live-dot"></span>LIVE TRACKING</div>
+        <div class="hero-row">
+          <div class="hero-left">
+            <h3><span class="rf-icon">🛡</span> NEXT SPAWN</h3>
+            <div id="nextBossName">---</div>
+            <div id="nextBossLocation" class="hero-location"></div>
+            <div id="nextBossChBadge" class="hero-ch-badge"><span class="rf-icon">⏱</span> CH --</div>
+          </div>
+          <div class="hero-timer-block">
+            <div id="nextBossTimer">--:--:--</div>
+            <div class="hero-timer-labels"><span>HRS</span><span>MIN</span><span>SEC</span></div>
+          </div>
+          <div id="heroArt" class="hero-art">
+            <img id="heroMapIcon" class="hero-map-icon" alt="">
+            <div class="hero-art-caption">BOSS<br>APPEARS<br>SOON</div>
+          </div>
+        </div>
+        <div class="hero-progress"><div class="hero-progress-bar" id="heroProgressBar"></div></div>
+        <div id="nextBossTime">---</div>
+      </div>
+
+      <!-- BOSSES SECTION -->
+      <section id="bossesSection">
+        <div class="section-header">
+          <h3><span class="rf-icon">💀</span> BOSSES</h3>
+          <div class="section-header-controls">
+            <button class="control-bar control-sort" id="sortBtn">AUTO SORT: ON</button>
+            <button class="control-bar control-sound" id="soundBtn">ALARM: ON</button>
+            <button class="control-bar control-reset" onclick="resetAll()">RESET ALL</button>
+            <div class="boss-search-wrap">
+              <span class="boss-search-icon">🔍</span>
+              <input type="text" id="bossSearchInput" class="boss-search-input" placeholder="Search: ch0, ef, mpcamp…" autocomplete="off">
+            </div>
+            <button id="bossFilterToggleBtn" class="respawn-filter-btn" type="button">
+              <span class="rf-icon">⏱</span>
+              <span>SELECT BOSSES</span>
+              <span class="rf-arrow">▾</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- RESPAWN FILTER DROPDOWN -->
+        <div id="respawnFilterDock">
+          <div id="bossFilterPanel">
+            <div class="filter-header">
+              <h3><span class="rf-icon">⚔</span> BOSSES &amp; RESPAWN TIME</h3>
+            </div>
+            <div class="filter-actions">
+              <button class="small-btn btn-refresh" id="filterShowAllBtn">SHOW ALL</button>
+              <button class="small-btn btn-clear" id="filterHideAllBtn">HIDE ALL</button>
+            </div>
+            <div id="hourPillRow"></div>
+            <div class="pill-row-label">CHANNEL FILTER</div>
+            <div id="channelPillRow"></div>
+            <div id="bossFilterList"></div>
+          </div>
+        </div>
+
+        <div id="channelsWrapper"></div>
+      </section>
+    </main>
+
+    <!-- ============ RIGHT COLUMN ============ -->
+    <aside id="rightCol">
+      <div id="historyPanel">
+        <h3><span class="rf-icon">📜</span> KILL HISTORY</h3>
+        <div class="history-search-wrap">
+          <span class="boss-search-icon">🔍</span>
+          <input type="text" id="historySearchInput" class="boss-search-input" placeholder="Search: dsjr, sg campus, ch1…" autocomplete="off">
+        </div>
+        <div id="historyList"></div>
+
+        <div class="history-actions">
+          <button class="small-btn btn-refresh" onclick="refreshHistory()">REFRESH</button>
+          <button class="small-btn btn-clear" onclick="clearHistory()">CLEAR</button>
+        </div>
+
+        <input id="pinInput" type="password" placeholder="Admin PIN">
+        <div id="pinError"></div>
+      </div>
+    </aside>
+
+  </div>
+
+  <footer id="appFooter">
+    <div class="footer-brand"><img src="image/icon/UG_logo.png" class="footer-logo" alt=""> BOSS TRACKER</div>
+    <div class="footer-tag">www.ungvrnd.com</div>
+  </footer>
+
+</div>
+
+<audio id="sound"><source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+
+<!-- ✅ HELP / POP-UP GUIDE -->
+<button id="guideHelpBtn" title="How to use the tracker" aria-label="Help">?</button>
+
+<div id="guideOverlay" class="guide-overlay">
+  <div class="guide-modal">
+    <button id="guideCloseBtn" class="guide-close" aria-label="Close">&times;</button>
+
+    <div class="guide-header">
+      <h2>TRACKER <span>POP-UP GUIDE</span></h2>
+      <p>Your complete guide to using the RAN Boss Tracker.</p>
+    </div>
+
+    <div class="guide-steps">
+      <div class="guide-step">
+        <div class="guide-step-num">1</div>
+        <h3>CLICK <span class="c-red">KILLED NOW</span><br>TO START THE TIMER</h3>
+        <p>After clicking <b>Killed Now</b>, the timer will start counting down to the next spawn.</p>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-num">2</div>
+        <h3>CLICK THE <span class="c-cyan">CALENDAR ICON</span><br>TO EDIT THE TIME</h3>
+        <p>Click the calendar icon to choose a new date &amp; time.</p>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-num">3</div>
+        <h3>THEN CLICK<br><span class="c-blue">SET MANUAL</span></h3>
+        <p>After setting the date &amp; time, click <b>Set Manual</b> to save the time to the tracker.</p>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-num">4</div>
+        <h3>WATCH THE <span class="c-cyan">NEXT SPAWN</span><br>LIVE TRACKING PANEL</h3>
+        <p>The big panel at the top always shows the soonest boss — its location, channel and a live countdown. Use the left menu (<b>Home, Boss List, Kill History, Settings</b>) to jump around.</p>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-num">5</div>
+        <h3>READ THE <span class="c-gold">CHANNEL COLORS</span></h3>
+        <p>Every card and the Next Spawn panel carry a colored channel badge, matching the legend in the left menu:</p>
+        <div class="guide-ch-row">
+          <span class="guide-ch-chip ch-0"><i></i>CH 0</span>
+          <span class="guide-ch-chip ch-1"><i></i>CH 1</span>
+          <span class="guide-ch-chip ch-2"><i></i>CH 2</span>
+          <span class="guide-ch-chip ch-3"><i></i>CH 3</span>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-num">6</div>
+        <h3>USE <span class="c-cyan">SMART SEARCH</span><br>WITH SHORTCUTS</h3>
+        <p>Type shortcuts in the Boss search box and separate them with spaces — every word must match. Example: <code>ch0 ef</code> shows only CH 0 Etherial Fist.</p>
+        <p class="guide-abbr"><b>Channel:</b> <code>ch0</code> <code>ch1</code> <code>ch2</code> <code>ch3</code><br>
+          <b>Boss:</b> <code>dsjr</code> <code>ef</code> <code>nk</code> <code>ds</code> <code>dam</code> <code>cj</code><br>
+          <b>Map:</b> <code>mpcamp</code> <code>sgcamp</code> <code>phcamp</code> <code>mph</code> <code>sgh</code> <code>phh</code> <code>py</code> <code>leo</code></p>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-num">7</div>
+        <h3><span class="c-cyan">ALL BOSSES</span> FILTER<br>BY RESPAWN OR CHANNEL</h3>
+        <p>The tracker starts empty. Open the filter dropdown (or click <b>Settings</b> in the left menu) and tap the <b>boss names</b> (or a spawn time like 1H) you want to track, then tap <b>CH 0–3</b> to narrow by channel (none picked = all channels). <b>Show All</b> / <b>Hide All</b> for quick changes. Your setup is remembered.</p>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-num">8</div>
+        <h3><span class="c-blue">AUTO SORT</span> &amp;<br><span class="c-gold">ALARM</span> TOGGLES</h3>
+        <p>Auto Sort keeps the soonest-spawning bosses at the top automatically. Alarm plays a sound when a boss is about to spawn.</p>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-num">9</div>
+        <h3><span class="c-red">DRAG TO TRASH</span> OR<br><span class="c-blue">RESET ALL</span></h3>
+        <p>Drag a card's <b>⠿ grip</b> onto the trash bin in the left menu to reset just that boss. Click <b>Reset All</b> if the server restarts to reset every timer at once.</p>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-num">10</div>
+        <h3>LOST THE TIMER?<br>SEARCH <span class="c-teal">KILL HISTORY</span></h3>
+        <p>Kill History shows each boss's icon, location, channel and exact kill time. Use its search box (e.g. <code>dsjr</code>, <code>sg campus</code>, <code>ch1</code>) to find the latest kill, then edit it into your tracker.</p>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-num">11</div>
+        <h3>TO CLEAR HISTORY<br>INPUT THE <span class="c-gold">ADMIN PIN</span></h3>
+        <p>Enter your Admin PIN then click <b>Clear</b> to clear the Kill History.</p>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-num">12</div>
+        <h3>CLICK &amp; DRAG TO<br><span class="c-cyan">PAN THE BOSS GRID</span></h3>
+        <p>On a small browser window, click and hold anywhere on the boss grid then drag to scroll. On touchscreens, just swipe sideways.</p>
+      </div>
+
+      <div class="guide-step">
+        <div class="guide-step-num">13</div>
+        <h3>FILTER A BOSS TO SEE<br>ITS <span class="c-cyan">MAP LOCATION</span></h3>
+        <p>Search or filter a boss (e.g. <code>dsjr</code>) and the <b>Map Location</b> panel in the left menu shows the boss icon on every spawn spot of that map. Click the map to enlarge it.</p>
+      </div>
+    </div>
+
+    <div class="guide-summary">
+      <h4>QUICK SUMMARY</h4>
+      <div class="guide-summary-items">
+        <div class="summary-item"><span class="summary-icon c-red">🎯</span><span>Killed Now<br>to start the timer</span></div>
+        <div class="summary-item"><span class="summary-icon c-cyan">📅</span><span>Edit time using<br>the calendar</span></div>
+        <div class="summary-item"><span class="summary-icon c-blue">💾</span><span>Set Manual to<br>save the time</span></div>
+        <div class="summary-item"><span class="summary-icon c-cyan">🛡️</span><span>Next Spawn panel<br>shows the soonest boss</span></div>
+        <div class="summary-item"><span class="summary-icon c-gold">🎨</span><span>Channel colors:<br>CH0 · CH1 · CH2 · CH3</span></div>
+        <div class="summary-item"><span class="summary-icon c-cyan">🔍</span><span>Smart search:<br>ch0 ef mpcamp</span></div>
+        <div class="summary-item"><span class="summary-icon c-cyan">⏱</span><span>Filter by respawn<br>time or channel</span></div>
+        <div class="summary-item"><span class="summary-icon c-gold">🔀</span><span>Auto Sort &amp; Alarm<br>toggles</span></div>
+        <div class="summary-item"><span class="summary-icon c-red">🗑️</span><span>Drag card to trash<br>to reset one boss</span></div>
+        <div class="summary-item"><span class="summary-icon c-blue">🔄</span><span>Reset All if server<br>is restart</span></div>
+        <div class="summary-item"><span class="summary-icon c-teal">📜</span><span>Search Kill History<br>if you lost the timer</span></div>
+        <div class="summary-item"><span class="summary-icon c-gold">🔑</span><span>Admin PIN to<br>clear history</span></div>
+        <div class="summary-item"><span class="summary-icon c-cyan">🖱️</span><span>Click &amp; drag to<br>pan the grid</span></div>
+        <div class="summary-item"><span class="summary-icon c-cyan">🗺️</span><span>Filter a boss to see<br>its map spots</span></div>
+      </div>
+    </div>
+
+    <div class="guide-footer">
+      <label class="guide-dontshow"><input type="checkbox" id="guideDontShow"> Don't show this again</label>
+      <button id="guideGotItBtn" class="guide-gotit">GOT IT</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase (must load before script.js) -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<!-- APP LOGIC -->
+<script src="script.js"></script>
+
+</body>
+</html>
